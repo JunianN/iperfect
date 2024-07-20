@@ -2,14 +2,14 @@ import React from "react";
 import AceEditor from "react-ace"
 
 import "ace-builds/src-noconflict/mode-python"
-import "ace-builds/src-noconflict/theme-monokai"
+import "ace-builds/src-noconflict/theme-github_dark"
 import "ace-builds/src-noconflict/ext-language_tools"
 
 function CodeEditor({ onChange, value }) {
     return (
         <AceEditor
             mode="python"
-            theme="monokai"
+            theme="github_dark"
             onChange={onChange}
             value={value}
             editorProps={{ $blockScrolling: true }}
@@ -20,6 +20,7 @@ function CodeEditor({ onChange, value }) {
                 showLineNumbers: true,
                 tabSize: 2,
             }}
+            style={{ width: '100%', height: '100%' }}
         />
     );
 }
