@@ -5,7 +5,12 @@ import "ace-builds/src-noconflict/mode-python"
 import "ace-builds/src-noconflict/theme-github_dark"
 import "ace-builds/src-noconflict/ext-language_tools"
 
-function CodeEditor({ onChange, value }) {
+interface CodeEditorProps {
+    onChange: (newCode: string) => void;
+    value: string;
+}
+
+function CodeEditor({ onChange, value }: CodeEditorProps) {
     return (
         <AceEditor
             mode="python"

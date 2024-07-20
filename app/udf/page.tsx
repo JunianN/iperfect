@@ -9,7 +9,7 @@ import { Block } from "@mui/icons-material";
 export default function UDF() {
     const [code, setCode] = useState('# Write your code here...');
 
-    const HandleCodeChange = (newCode) => {
+    const HandleCodeChange = (newCode: string) => {
         setCode(newCode)
     };
 
