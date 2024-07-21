@@ -2,16 +2,27 @@
 
 import React, { useState } from "react";
 import { Box, Typography, Toolbar, Paper, Grid, TextField, Container, Link, Button } from "@mui/material";
+import axios from "axios";
 import CodeEditor from "../components/AceEditor";
 import Sidebar from "../components/Sidebar";
-import { Block } from "@mui/icons-material";
 
 export default function UDF() {
     const [code, setCode] = useState('# Write your code here...');
+    console.log("🚀 ~ UDF ~ code:", code)
 
     const HandleCodeChange = (newCode: string) => {
         setCode(newCode)
     };
+
+    const handleClick = async () => {
+        try {
+            const response = await axios.post('https://iperfect-api.vercel.app/code/', {
+                code: code,
+            });
+        } catch (error) {
+            console.error(error)
+        }
+    }
 
     return (
         <Box sx={{ display: 'flex' }}>
@@ -90,7 +101,7 @@ export default function UDF() {
                             <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '500px' }}>
                                 <CodeEditor onChange={HandleCodeChange} value={code} />
                                 <Box display='flex' justifyContent="flex-end">
-                                    <Button variant="contained" sx={{ mt: 2, display: 'inline-block', width: 'fit-content' }}>Run test</Button>
+                                    <Button onClick={handleClick} variant="contained" sx={{ mt: 2, display: 'inline-block', width: 'fit-content' }}>Run test</Button>
                                 </Box>
                             </Paper>
                         </Grid>
