@@ -34,6 +34,7 @@ export default function UDF() {
                     <Grid container spacing={3}>
                         <Grid item xs={12}>
                             <Paper
+                                elevation={3}
                                 sx={{
                                     p: 2,
                                     display: 'flex',
@@ -98,7 +99,7 @@ export default function UDF() {
                             </Paper>
                         </Grid>
                         <Grid item xs={12} sx={{}}>
-                            <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '500px' }}>
+                            <Paper elevation={3} sx={{ p: 2, display: 'flex', flexDirection: 'column', height: '500px' }}>
                                 <CodeEditor onChange={HandleCodeChange} value={code} />
                                 <Box display='flex' justifyContent="flex-end">
                                     <Button onClick={handleClick} variant="contained" sx={{ mt: 2, display: 'inline-block', width: 'fit-content' }}>Run test</Button>
