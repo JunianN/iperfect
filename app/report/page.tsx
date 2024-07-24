@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Box, Toolbar, Container, Tabs, Tab, Paper, Typography, Grid, Link, Button } from "@mui/material";
 import Sidebar from "../components/Sidebar";
+import ReportConfig from "../components/ReportConfig";
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -159,44 +160,7 @@ export default function Report() {
                         </Box>
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={1}>
-                        <Box sx={{ padding: 2 }}>
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3 }}>
-                                <Box>
-                                    <Typography variant="h6">Date: 01/08/2024 | <Link href="#" underline="hover">{"<<change>>"}</Link></Typography>
-                                    <Typography variant="subtitle1">Config: default_config</Typography>
-                                </Box>
-                                <Box sx={{ my: 2 }}>
-                                    <Link href="#" underline="hover">load_config</Link> | <Link href="#" underline="hover">save_config</Link>
-                                </Box>
-                            </Box>
-                            <Paper elevation={3} sx={{ p: 2 }}>
-                                <Grid container spacing={2}>
-                                    {data2.map((factory, index) => (
-                                        <Grid item xs={12} md={4} key={index}>
-                                            <Typography variant="h6">{factory.name}</Typography>
-                                            {factory.groups.map((group, groupIndex) => (
-                                                <Box key={groupIndex} sx={{ mt: 2 }}>
-                                                    <Typography variant="subtitle1">Group {groupIndex + 1}:</Typography>
-                                                    <Box sx={{ paddingLeft: '24px' }}>
-                                                        <Link component='button' sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                            Add new formula
-                                                        </Link>
-                                                        {group.formulas.map((formula, formulaIndex) => (
-                                                            <Typography key={formulaIndex}>
-                                                                formula {formulaIndex + 1}: {formula.name} <Link href="#" underline="hover" sx={{ fontWeight: 'bold' }}>edit</Link>
-                                                            </Typography>
-                                                        ))}
-                                                    </Box>
-                                                </Box>
-                                            ))}
-                                            <Link component='button' sx={{ fontWeight: 'bold', mt: 2 }}>
-                                                Add new Group
-                                            </Link>
-                                        </Grid>
-                                    ))}
-                                </Grid>
-                            </Paper>
-                        </Box>
+                        <ReportConfig/>
                     </CustomTabPanel>
                 </Container>
             </Box>

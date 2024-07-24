@@ -8,8 +8,6 @@ import Sidebar from "../components/Sidebar";
 
 export default function UDF() {
     const [code, setCode] = useState('# Write your code here...');
-    console.log("🚀 ~ UDF ~ code:", code)
-
     const HandleCodeChange = (newCode: string) => {
         setCode(newCode)
     };
