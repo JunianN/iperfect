@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Box, Toolbar, Container, Tabs, Tab, Paper, Typography, Grid, Link, Button } from "@mui/material";
 import Sidebar from "../components/Sidebar";
 import ReportConfig from "../components/ReportConfig";
+import ReportViewer from "../components/ReportViewer";
+
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -40,93 +42,6 @@ export default function Report() {
         setValue(newValue);
     };
 
-    const data1 = {
-        factory: "Pabrik 1",
-        status: "<<status>>",
-        date: "01/08/2024",
-        change: "<<change>>",
-        groups: [
-            {
-                id: 1,
-                formulas: [
-                    { name: "Formula 1", value: 200 },
-                    { name: "Formula 2", params: { param1: 100, param2: 200 } },
-                    { name: "Formula n", value: 300 }
-                ]
-            },
-            {
-                id: 2,
-                formulas: [
-                    { name: "Formula 1", value: 200 },
-                    { name: "Formula 2", value: 200 },
-                    { name: "Formula n", value: 300 }
-                ]
-            },
-            {
-                id: 3,
-                formulas: [
-                    { name: "Formula 1", value: 200 },
-                    { name: "Formula 2", value: 200 },
-                    { name: "Formula n", value: 300 }
-                ]
-            }
-        ]
-    };
-
-    const data2 = [
-        {
-            name: 'Pabrik 1',
-            groups: [
-                {
-                    formulas: [
-                        { name: 'func1' },
-                        { name: 'func2' }
-                    ]
-                },
-                {
-                    formulas: [
-                        { name: 'func1' },
-                        { name: 'func2' }
-                    ]
-                }
-            ]
-        },
-        {
-            name: 'Pabrik 2',
-            groups: [
-                {
-                    formulas: [
-                        { name: 'func1' },
-                        { name: 'func2' }
-                    ]
-                },
-                {
-                    formulas: [
-                        { name: 'func1' },
-                        { name: 'func2' }
-                    ]
-                }
-            ]
-        },
-        {
-            name: 'Pabrik 3',
-            groups: [
-                {
-                    formulas: [
-                        { name: 'func1' },
-                        { name: 'func2' }
-                    ]
-                },
-                {
-                    formulas: [
-                        { name: 'func1' },
-                        { name: 'func2' }
-                    ]
-                }
-            ]
-        }
-    ];
-
     return (
         <Box sx={{ display: 'flex' }}>
             <Sidebar />
@@ -140,27 +55,10 @@ export default function Report() {
                         </Tabs>
                     </Box>
                     <CustomTabPanel value={value} index={0}>
-                        <Box sx={{ padding: 2 }}>
-                            <Typography variant="h5" gutterBottom>{data1.factory}</Typography>
-                            <Typography variant="body1">{data1.status}</Typography>
-                            <Typography variant="body1">Date: {data1.date} | {data1.change}</Typography>
-                            {data1.groups.map((group) => (
-                                <Paper key={group.id} elevation={3} sx={{ margin: '16px 0', padding: 2 }}>
-                                    <Typography variant="subtitle1">Group {group.id}:</Typography>
-                                    {group.formulas.map((formula, index) => (
-                                        <Box key={index} sx={{ paddingLeft: '24px', paddingTop: '8px' }}>
-                                            <Typography variant="body2">
-                                                {formula.name}: {formula.value || (formula.params ? Object.entries(formula.params).map(([key, value]) => `${key}=${value}`).join(', ') : '')}
-                                            </Typography>
-                                            {index === group.formulas.length - 2 && <Typography variant="body2" sx={{ paddingTop: '8px' }}>...</Typography>}
-                                        </Box>
-                                    ))}
-                                </Paper>
-                            ))}
-                        </Box>
+                        <ReportViewer />
                     </CustomTabPanel>
                     <CustomTabPanel value={value} index={1}>
-                        <ReportConfig/>
+                        <ReportConfig />
                     </CustomTabPanel>
                 </Container>
             </Box>
