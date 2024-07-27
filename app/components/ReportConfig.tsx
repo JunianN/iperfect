@@ -1,8 +1,11 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { Box, Toolbar, Container, Tabs, Tab, Paper, Typography, Grid, Link, Button } from "@mui/material";
 import Sidebar from "../components/Sidebar";
+
 interface TabPanelProps {
     children?: React.ReactNode;
     index: number;
@@ -34,6 +37,44 @@ function a11yProps(index: number) {
 
 export default function ReportConfig() {
     const [value, setValue] = useState(0);
+    const [configs, setConfigs] = useState([])
+    const [config, setConfig] = useState()
+    console.log("🚀 ~ ReportConfig ~ config:", config)
+    console.log("🚀 ~ ReportConfig ~ configs:", configs)
+    const [usedConfig, setUsedConfig] = useState('default_config')
+    console.log("🚀 ~ ReportConfig ~ usedConfig:", usedConfig)
+    const router = useRouter();
+
+    useEffect(() => {
+        const fetchAllConfig = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/config');
+                setConfigs(response.data);
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    console.log(error.response.data.error);
+                } else {
+                    console.log(error)
+                }
+            }
+        };
+
+        const fetchConfigDetails = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/config/66a475001cc8da0f7001d15c/details');
+                setConfig(response.data);
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    console.log(error.response.data.error);
+                } else {
+                    console.log(error)
+                }
+            }
+        };
+
+        fetchAllConfig();
+        fetchConfigDetails();
+    }, []);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -109,7 +150,7 @@ export default function ReportConfig() {
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3 }}>
                             <Box>
                                 <Typography variant="h6">Date: 01/08/2024 | <Link href="#" underline="hover">{"<<change>>"}</Link></Typography>
-                                <Typography variant="subtitle1">Config: default_config</Typography>
+                                <Typography variant="subtitle1">Config: {config?.name}</Typography>
                             </Box>
                             <Box sx={{ my: 2 }}>
                                 <Link href="#" underline="hover">load_config</Link>
@@ -122,12 +163,12 @@ export default function ReportConfig() {
                                         <Box key={groupIndex} sx={{ mt: 2 }}>
                                             <Typography variant="subtitle1">{group.name}:</Typography>
                                             <Box sx={{ paddingLeft: '24px' }}>
-                                                <Link component='button' sx={{ fontWeight: 'bold', mb: 1 }}>
+                                                <Link component='button' onClick={() => router.push(`udf/add/${config?._id}`)} sx={{ fontWeight: 'bold', mb: 1 }}>
                                                     Add new formula
                                                 </Link>
-                                                {group.formulas.map((formula, formulaIndex) => (
+                                                {config?.udfs.map((udf, formulaIndex) => (
                                                     <Typography key={formulaIndex}>
-                                                        formula {formulaIndex + 1}: {formula.name} <Link href="#" underline="hover" sx={{ fontWeight: 'bold' }}>edit</Link>
+                                                        formula {formulaIndex + 1}: {udf.name} <Link component='button' onClick={() => router.push(`udf/${udf._id}`)} underline="hover" sx={{ fontWeight: 'bold' }}>edit</Link>
                                                     </Typography>
                                                 ))}
                                             </Box>
@@ -142,46 +183,6 @@ export default function ReportConfig() {
                     </Box>
                 </CustomTabPanel>
             ))}
-            {/* <CustomTabPanel value={value} index={0}>
-                <Box sx={{ padding: 2 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3 }}>
-                        <Box>
-                            <Typography variant="h6">Date: 01/08/2024 | <Link href="#" underline="hover">{"<<change>>"}</Link></Typography>
-                            <Typography variant="subtitle1">Config: default_config</Typography>
-                        </Box>
-                        <Box sx={{ my: 2 }}>
-                            <Link href="#" underline="hover">load_config</Link>
-                        </Box>
-                    </Box>
-                    <Paper elevation={3} sx={{ p: 2 }}>
-                        <Grid container spacing={2}>
-                            {data2.map((factory, index) => (
-                                <Grid item xs={12} md={4} key={index}>
-                                    <Typography variant="h6">{factory.name}</Typography>
-                                    {factory.groups.map((group, groupIndex) => (
-                                        <Box key={groupIndex} sx={{ mt: 2 }}>
-                                            <Typography variant="subtitle1">Group {groupIndex + 1}:</Typography>
-                                            <Box sx={{ paddingLeft: '24px' }}>
-                                                <Link component='button' sx={{ fontWeight: 'bold', mb: 1 }}>
-                                                    Add new formula
-                                                </Link>
-                                                {group.formulas.map((formula, formulaIndex) => (
-                                                    <Typography key={formulaIndex}>
-                                                        formula {formulaIndex + 1}: {formula.name} <Link href="#" underline="hover" sx={{ fontWeight: 'bold' }}>edit</Link>
-                                                    </Typography>
-                                                ))}
-                                            </Box>
-                                        </Box>
-                                    ))}
-                                    <Link component='button' sx={{ fontWeight: 'bold', mt: 2 }}>
-                                        Add new Group
-                                    </Link>
-                                </Grid>
-                            ))}
-                        </Grid>
-                    </Paper>
-                </Box>
-            </CustomTabPanel> */}
         </Container>
     )
 }
