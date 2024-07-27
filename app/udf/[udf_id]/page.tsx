@@ -7,10 +7,25 @@ import axios from "axios";
 import CodeEditor from "../../components/AceEditor";
 import Sidebar from "../../components/Sidebar";
 
+interface Inputs {
+    value: string;
+    name: string;
+    default_value: number;
+}
+
+interface Udf {
+    _id: string;
+    name: string;
+    output_type: string;
+    inputs: Inputs[];
+    code: string;
+}
+
 export default function UDF() {
     const { udf_id } = useParams();
     const [code, setCode] = useState('# Write your code here...');
-    const [udf, setUdf] = useState();
+    const [udf, setUdf] = useState<Udf | null>(null);
+    console.log("🚀 ~ UDF ~ udf:", udf)
     const [name, setName] = useState('');
     const [outputType, setOutputType] = useState('');
 

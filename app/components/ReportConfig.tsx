@@ -12,6 +12,17 @@ interface TabPanelProps {
     value: number;
 }
 
+interface Udfs {
+    _id: string;
+    name: string;
+  }
+
+interface Config {
+    _id: string;
+    name: string;
+    udfs: Udfs[]
+  }
+
 function CustomTabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
 
@@ -38,11 +49,9 @@ function a11yProps(index: number) {
 export default function ReportConfig() {
     const [value, setValue] = useState(0);
     const [configs, setConfigs] = useState([])
-    const [config, setConfig] = useState()
+    const [config, setConfig] = useState<Config | null>(null)
     console.log("🚀 ~ ReportConfig ~ config:", config)
-    console.log("🚀 ~ ReportConfig ~ configs:", configs)
     const [usedConfig, setUsedConfig] = useState('default_config')
-    console.log("🚀 ~ ReportConfig ~ usedConfig:", usedConfig)
     const router = useRouter();
 
     useEffect(() => {
