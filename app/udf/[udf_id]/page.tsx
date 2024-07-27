@@ -44,7 +44,7 @@ export default function UDF() {
     useEffect(() => {
         const fetchUdf = async () => {
             try {
-                const response = await axios.get(`http://127.0.0.1:8000/udf/${udf_id}`);
+                const response = await axios.get(`http://https://iperfect-api.vercel.app/udf/${udf_id}`);
                 setUdf(response.data);
                 setName(response.data.name)
                 setOutputType(response.data.output_type)

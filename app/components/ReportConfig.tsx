@@ -57,7 +57,7 @@ export default function ReportConfig() {
     useEffect(() => {
         const fetchAllConfig = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/config');
+                const response = await axios.get('https://iperfect-api.vercel.app/config');
                 setConfigs(response.data);
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response) {
@@ -70,7 +70,7 @@ export default function ReportConfig() {
 
         const fetchConfigDetails = async () => {
             try {
-                const response = await axios.get('http://127.0.0.1:8000/config/66a475001cc8da0f7001d15c/details');
+                const response = await axios.get('https://iperfect-api.vercel.app//config/66a475001cc8da0f7001d15c/details');
                 setConfig(response.data);
             } catch (error) {
                 if (axios.isAxiosError(error) && error.response) {
