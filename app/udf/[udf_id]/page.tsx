@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Box, Typography, Toolbar, Paper, Grid, TextField, Container, Link, Button } from "@mui/material";
 import axios from "axios";
 import CodeEditor from "../../components/AceEditor";
@@ -22,6 +22,7 @@ interface Udf {
 }
 
 export default function UDF() {
+    const router = useRouter();
     const { udf_id } = useParams();
     const [code, setCode] = useState('# Write your code here...');
     const [udf, setUdf] = useState<Udf | null>(null);
@@ -44,7 +45,7 @@ export default function UDF() {
     useEffect(() => {
         const fetchUdf = async () => {
             try {
-                const response = await axios.get(`http://https://iperfect-api.vercel.app/udf/${udf_id}`);
+                const response = await axios.get(`http://127.0.0.1:8000/udf/${udf_id}`);
                 setUdf(response.data);
                 setName(response.data.name)
                 setOutputType(response.data.output_type)
@@ -63,9 +64,28 @@ export default function UDF() {
 
     const handleClick = async () => {
         try {
-            const response = await axios.post('https://iperfect-api.vercel.app/code/', {
+            const response = await axios.put(`http://127.0.0.1:8000/udf/${udf_id}`, {
+                name: name,
+                output_type: outputType,
+                inputs: [{
+                    name: "input1",
+                    value: "P1/Clean/TDA/tag001",
+                    default_value: 0
+                }, {
+                    name: "input2",
+                    value: "P1/Clean/TDA/tag002",
+                    default_value: 0
+                }, {
+                    name: "input3",
+                    value: "P1/TieIn/tag003",
+                    default_value: 0
+                }],
                 code: code,
             });
+
+            if (response.status === 200) {
+                router.push('/report')
+            }
         } catch (error) {
             console.error(error)
         }

@@ -7,8 +7,6 @@ import styles from './Sidebar.module.css'
 function Sidebar() {
   const router = useRouter();
   const pathname = usePathname()
-  console.log("🚀 ~ Sidebar ~ pathname:", pathname)
-
   const menuItems = [
     { text: 'Date Config', path: '/date-config' },
     { text: 'Cleansing', path: '/cleansing' },

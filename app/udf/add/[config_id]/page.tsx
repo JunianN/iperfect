@@ -30,7 +30,7 @@ export default function NewUDF() {
 
     const handleClick = async () => {
         try {
-            const response = await axios.post(`https://iperfect-api.vercel.app/udf/${config_id}/add`, {
+            const response = await axios.post(`http://127.0.0.1:8000/udf/${config_id}/add`, {
                 name: name,
                 output_type: outputType,
                 inputs: [{
@@ -50,7 +50,7 @@ export default function NewUDF() {
             });
 
             if (response.status === 200) {
-                router.push('report')
+                router.push('/report')
             }
         } catch (error) {
             console.error(error)
