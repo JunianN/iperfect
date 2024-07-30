@@ -5,6 +5,7 @@ import axios from "axios";
 import { useRouter } from "next/navigation";
 import { Box, Toolbar, Container, Tabs, Tab, Paper, Typography, Grid, Link, Button, Modal, TextField } from "@mui/material";
 import Sidebar from "../components/Sidebar";
+import { config } from "process";
 
 const style = {
     position: 'absolute' as 'absolute',
@@ -41,6 +42,14 @@ interface Config {
     groups: Groups[]
 }
 
+interface Factory {
+    _id: string;
+    name: string;
+    config: Config;
+}
+
+interface Factories extends Array<Factory> { }
+
 function CustomTabPanel(props: TabPanelProps) {
     const { children, value, index, ...other } = props;
 
@@ -68,15 +77,37 @@ export default function ReportConfig() {
     const [value, setValue] = useState(0);
     const [newGroupName, setNewGroupName] = useState('');
     const [addGroup, setAddGroup] = useState(false);
+    const [factories, setFactories] = useState<Factories>([])
+    console.log("🚀 ~ ReportConfig ~ factories:", factories)
     const [configs, setConfigs] = useState([])
-    const [config, setConfig] = useState<Config | null>(null)
-    const [usedConfig, setUsedConfig] = useState('default_config')
+    const [selectedConfigId, setSelectedConfigId] = useState('');
+    console.log("🚀 ~ ReportConfig ~ selectedConfig:", selectedConfigId)
     const router = useRouter();
     const [open, setOpen] = useState(false);
-    const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+
+    const handleOpen = (configId: string) => {
+        setSelectedConfigId(configId)
+        setOpen(true);
+    }
+    const handleClose = () => {
+        setOpen(false);
+        setSelectedConfigId('')
+    }
 
     useEffect(() => {
+        const fetchAllFactory = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/factories/');
+                setFactories(response.data)
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    console.log(error.response.data.error);
+                } else {
+                    console.log(error)
+                }
+            }
+        };
+
         // const fetchAllConfig = async () => {
         //     try {
         //         // const response = await axios.get('http://127.0.0.1:8000/config');
@@ -90,22 +121,23 @@ export default function ReportConfig() {
         //     }
         // };
 
-        const fetchConfigDetails = async () => {
-            try {
-                const response = await axios.get('http://127.0.0.1:8000/config/66a6fee6251b21ea6b6920f9/details');
-                setConfig(response.data);
-                setAddGroup(false)
-            } catch (error) {
-                if (axios.isAxiosError(error) && error.response) {
-                    console.log(error.response.data.error);
-                } else {
-                    console.log(error)
-                }
-            }
-        };
+        // const fetchConfigDetails = async () => {
+        //     try {
+        //         const response = await axios.get('http://127.0.0.1:8000/config/66a6fee6251b21ea6b6920f9/details');
+        //         setConfig(response.data);
+        //         setAddGroup(false)
+        //     } catch (error) {
+        //         if (axios.isAxiosError(error) && error.response) {
+        //             console.log(error.response.data.error);
+        //         } else {
+        //             console.log(error)
+        //         }
+        //     }
+        // };
 
+        fetchAllFactory()
         // fetchAllConfig();
-        fetchConfigDetails();
+        // fetchConfigDetails();
     }, [addGroup]);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -114,7 +146,7 @@ export default function ReportConfig() {
 
     const handleAddNewGroup = async () => {
         try {
-            const response = await axios.post(`http://127.0.0.1:8000/configs/${config?._id}/groups`, {
+            const response = await axios.post(`http://127.0.0.1:8000/configs/${selectedConfigId}/groups`, {
                 name: newGroupName,
                 udf_ids: []
             });
@@ -128,24 +160,22 @@ export default function ReportConfig() {
         }
     }
 
-    const data2 = ['Pabrik 1', 'Pabrik 2'];
-
     return (
         <Container maxWidth="lg" sx={{ mb: 4 }}>
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={value} onChange={handleChange} aria-label="basic tabs example" sx={{ color: 'gold' }}>
-                    {data2.map((factory, index) => (
-                        <Tab key={index} label={factory} {...a11yProps(index)} />
+                    {factories?.map((factory, index) => (
+                        <Tab key={factory._id} label={factory.name} {...a11yProps(index)} />
                     ))}
                 </Tabs>
             </Box>
-            {data2.map((factory, index) => (
-                <CustomTabPanel value={value} index={index} key={index}>
+            {factories?.map((factory, index) => (
+                <CustomTabPanel value={value} index={index} key={factory._id}>
                     <Box sx={{ padding: 2 }}>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%', mb: 3 }}>
                             <Box>
                                 <Typography variant="h6">Date: 01/08/2024 | <Link href="#" underline="hover">{"<<change>>"}</Link></Typography>
-                                <Typography variant="subtitle1">Config: {config?.name}</Typography>
+                                <Typography variant="subtitle1">Config: {factory.config.name}</Typography>
                             </Box>
                             <Box sx={{ my: 2 }}>
                                 <Link href="#" underline="hover">load_config</Link>
@@ -153,12 +183,12 @@ export default function ReportConfig() {
                         </Box>
                         <Paper elevation={3} sx={{ p: 2 }}>
                             <Grid container spacing={2}>
-                                {config?.groups.map((group, groupIndex) => (
+                                {factory.config.groups.map((group, groupIndex) => (
                                     <Grid item xs={4} md={4} key={index}>
                                         <Box key={groupIndex} sx={{ mt: 2 }}>
                                             <Typography variant="subtitle1">{group.name}:</Typography>
                                             <Box sx={{ paddingLeft: '24px' }}>
-                                                <Link component='button' onClick={() => router.push(`/report/configs/${config._id}/groups/${group.name}/udfs`)} sx={{ fontWeight: 'bold', mb: 1 }}>
+                                                <Link component='button' onClick={() => router.push(`/report/configs/${factory.config._id}/groups/${group.name}/udfs`)} sx={{ fontWeight: 'bold', mb: 1 }}>
                                                     Add new formula
                                                 </Link>
                                                 {group.udfs.map((udf, udfIndex) => (
@@ -171,7 +201,7 @@ export default function ReportConfig() {
                                     </Grid>
                                 ))}
                             </Grid>
-                            <Link component='button' onClick={handleOpen} sx={{ fontWeight: 'bold', mt: 2 }}>
+                            <Link component='button' onClick={() => handleOpen(factory.config._id)} sx={{ fontWeight: 'bold', mt: 2 }}>
                                 Add new Group
                             </Link>
                         </Paper>
