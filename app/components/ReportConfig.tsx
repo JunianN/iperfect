@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { Box, Toolbar, Container, Tabs, Tab, Paper, Typography, Grid, Link, Button, Modal, TextField } from "@mui/material";
+import { Box, Toolbar, Container, Tabs, Tab, Paper, Typography, Grid, Link, Button, Modal, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, SelectChangeEvent } from "@mui/material";
 import Sidebar from "../components/Sidebar";
 import { config } from "process";
 
@@ -48,6 +48,7 @@ interface Factory {
     config: Config;
 }
 
+interface Configs extends Array<Config> { }
 interface Factories extends Array<Factory> { }
 
 function CustomTabPanel(props: TabPanelProps) {
@@ -76,23 +77,57 @@ function a11yProps(index: number) {
 export default function ReportConfig() {
     const [value, setValue] = useState(0);
     const [newGroupName, setNewGroupName] = useState('');
-    const [addGroup, setAddGroup] = useState(false);
+    const [refetch, setRefetch] = useState(false);
+    console.log("🚀 ~ ReportConfig ~ refetch:", refetch)
     const [factories, setFactories] = useState<Factories>([])
-    console.log("🚀 ~ ReportConfig ~ factories:", factories)
-    const [configs, setConfigs] = useState([])
-    const [selectedConfigId, setSelectedConfigId] = useState('');
-    console.log("🚀 ~ ReportConfig ~ selectedConfig:", selectedConfigId)
+    const [selectedConfigId, setSelectedConfigId] = useState<string>('');
+    const [selectedFactoryId, setSelectedFactoryId] = useState<string>('');
+    const [configs, setConfigs] = useState<Configs>([])
+    const [loadConfig, setLoadConfig] = useState<string>('')
     const router = useRouter();
     const [open, setOpen] = useState(false);
+    const [openLoad, setOpenLoad] = useState(false);
+
+    const handleChangeLoadConfig = (event: SelectChangeEvent<typeof loadConfig>) => {
+        setLoadConfig(event.target.value || '');
+      };
 
     const handleOpen = (configId: string) => {
         setSelectedConfigId(configId)
         setOpen(true);
     }
+
     const handleClose = () => {
         setOpen(false);
         setSelectedConfigId('')
     }
+
+    const handleOpenLoad = (factoryId: string) => {
+        setOpenLoad(true);
+        setSelectedFactoryId(factoryId)
+    }
+
+    const handleCloseLoad = () => {
+        setOpenLoad(false);
+        setSelectedFactoryId('')
+    }
+
+    useEffect(() => {
+        const fetchAllConfig = async () => {
+            try {
+                const response = await axios.get('http://127.0.0.1:8000/config');
+                setConfigs(response.data);
+            } catch (error) {
+                if (axios.isAxiosError(error) && error.response) {
+                    console.log(error.response.data.error);
+                } else {
+                    console.log(error)
+                }
+            }
+        };
+
+        fetchAllConfig();
+    }, []);
 
     useEffect(() => {
         const fetchAllFactory = async () => {
@@ -108,37 +143,9 @@ export default function ReportConfig() {
             }
         };
 
-        // const fetchAllConfig = async () => {
-        //     try {
-        //         // const response = await axios.get('http://127.0.0.1:8000/config');
-        //         // setConfigs(response.data);
-        //     } catch (error) {
-        //         if (axios.isAxiosError(error) && error.response) {
-        //             console.log(error.response.data.error);
-        //         } else {
-        //             console.log(error)
-        //         }
-        //     }
-        // };
-
-        // const fetchConfigDetails = async () => {
-        //     try {
-        //         const response = await axios.get('http://127.0.0.1:8000/config/66a6fee6251b21ea6b6920f9/details');
-        //         setConfig(response.data);
-        //         setAddGroup(false)
-        //     } catch (error) {
-        //         if (axios.isAxiosError(error) && error.response) {
-        //             console.log(error.response.data.error);
-        //         } else {
-        //             console.log(error)
-        //         }
-        //     }
-        // };
-
+        setRefetch(false)
         fetchAllFactory()
-        // fetchAllConfig();
-        // fetchConfigDetails();
-    }, [addGroup]);
+    }, [refetch]);
 
     const handleChange = (event: React.SyntheticEvent, newValue: number) => {
         setValue(newValue);
@@ -153,7 +160,20 @@ export default function ReportConfig() {
 
             if (response.status === 200) {
                 handleClose()
-                setAddGroup(true)
+                setRefetch(true)
+            }
+        } catch (error) {
+            console.error(error)
+        }
+    
+    }
+    const handleLoadConfig = async () => {
+        try {
+            const response = await axios.put(`http://127.0.0.1:8000/factory/${selectedFactoryId}/config/${loadConfig}`);
+
+            if (response.status === 200) {
+                handleCloseLoad()
+                setRefetch(true)
             }
         } catch (error) {
             console.error(error)
@@ -178,7 +198,7 @@ export default function ReportConfig() {
                                 <Typography variant="subtitle1">Config: {factory.config.name}</Typography>
                             </Box>
                             <Box sx={{ my: 2 }}>
-                                <Link href="#" underline="hover">load_config</Link>
+                                <Link component='button' onClick={() => handleOpenLoad(factory._id)}>load_config</Link>
                             </Box>
                         </Box>
                         <Paper elevation={3} sx={{ p: 2 }}>
@@ -212,8 +232,6 @@ export default function ReportConfig() {
             <Modal
                 open={open}
                 onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
             >
                 <Box sx={style}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -232,6 +250,39 @@ export default function ReportConfig() {
                     />
                     <Box display='flex' justifyContent="flex-end">
                         <Button sx={{ mt: 2 }} onClick={handleAddNewGroup} variant="contained">Add</Button>
+                    </Box>
+                </Box>
+            </Modal>
+
+            <Modal
+                open={openLoad}
+                onClose={handleCloseLoad}
+            >
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Load Config
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        Choose config
+                    </Typography>
+                    <Box component="form" sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                        <FormControl fullWidth sx={{ m: 1, minWidth: 120, }}>
+                            <InputLabel id="demo-dialog-select-label">Config</InputLabel>
+                            <Select
+                                labelId="demo-dialog-select-label"
+                                id="demo-dialog-select"
+                                value={loadConfig}
+                                onChange={handleChangeLoadConfig}
+                                input={<OutlinedInput label="Config" />}
+                            >
+                                {configs?.map((config) => (
+                                    <MenuItem key={config._id} value={config._id}>{config.name}</MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+                    </Box>
+                    <Box display='flex' justifyContent="flex-end">
+                        <Button sx={{ mt: 2 }} onClick={handleLoadConfig} variant="contained">Load</Button>
                     </Box>
                 </Box>
             </Modal>
